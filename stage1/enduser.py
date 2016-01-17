@@ -5,6 +5,8 @@ import time
 from Crypto.PublicKey import RSA
 
 AUTH_CODE = "NTUIM"
+FACTORY_PUBLIC_KEY = "factory_public_key.pem"
+ENDUSER_PRIVATE_KEY = "enduser_private_key.pem"
 
 def upload_listener():
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -41,7 +43,7 @@ while(True):
     x = raw_input("What do you want to do")
 
     if x == "D":
-        f = open('server_public_key.pem','r')
+        f = open(FACTORY_PUBLIC_KEY,'r')
         server_public_key = RSA.importKey(f.read())
         encrypted_code = server_public_key.encrypt(AUTH_CODE,24)
 
@@ -66,12 +68,10 @@ while(True):
             data = sock.recv(1000)
             amount_received += len(data)
 
-            print >>sys.stderr, 'received "%s"' % data
-
-            f = open('client_private_key.pem','r')
+            f = open(ENDUSER_PRIVATE_KEY,'r')
             client_private_key = RSA.importKey(f.read())
             price = client_private_key.decrypt(data)
-            
+            print(price)
         finally:
             print >>sys.stderr, 'closing socket'
             sock.close()

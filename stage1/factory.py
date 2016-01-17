@@ -5,7 +5,8 @@ import time
 from Crypto.PublicKey import RSA
 
 AUTH_CODE = "NTUIM"
-
+FACTORY_PRIVATE_KEY = "factory_private_key.pem"
+ENDUSER_PUBLIC_KEY = "enduser_public_key.pem"
 
 def send_server():
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -31,13 +32,13 @@ def send_server():
                 if data:
                     print("Get Authentication Code")
 
-                    f = open('server_private_key.pem','r')
+                    f = open(FACTORY_PRIVATE_KEY,'r')
                     server_private_key = RSA.importKey(f.read())
                     decrypted_code = server_private_key.decrypt(data)
                     
                     if decrypted_code == AUTH_CODE:
 
-                        f2 = open('client_public_key.pem','r')
+                        f2 = open(ENDUSER_PUBLIC_KEY,'r')
                         f3 = open('price.txt','r')
                         client_public_key = RSA.importKey(f2.read())
                         encrypted_code = client_public_key.encrypt(f3.read(),24)

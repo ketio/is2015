@@ -1,24 +1,24 @@
 from Crypto.PublicKey import RSA
 
 
-# Server Key 
-server_key = RSA.generate(2048)
-server_public_key = server_key.publickey().exportKey('PEM')
-server_private_key = server_key.exportKey('PEM')
+# factory Key 
+factory_key = RSA.generate(2048)
+factory_public_key = factory_key.publickey().exportKey('PEM')
+factory_private_key = factory_key.exportKey('PEM')
 
-server_publick_key_file = open("server_public_key.pem", 'w')
-server_private_key_file = open("server_private_key.pem", 'w')
+factory_publick_key_file = open("./factory_public_key.pem", 'w')
+factory_private_key_file = open("./factory_private_key.pem", 'w')
 
-server_publick_key_file.write(str(server_public_key))
-server_private_key_file.write(str(server_private_key))
+factory_publick_key_file.write(str(factory_public_key))
+factory_private_key_file.write(str(factory_private_key))
 
-# Client Key
-client_key = RSA.generate(2048)
-client_public_key = client_key.publickey().exportKey('PEM')
-client_private_key = client_key.exportKey('PEM')
+# enduser Key
+enduser_key = RSA.generate(2048)
+enduser_public_key = enduser_key.publickey().exportKey('PEM')
+enduser_private_key = enduser_key.exportKey('PEM')
 
-client_publick_key_file = open("client_public_key.pem", 'w')
-client_private_key_file = open("client_private_key.pem", 'w')
+enduser_publick_key_file = open("./enduser_public_key.pem", 'w')
+enduser_private_key_file = open("./enduser_private_key.pem", 'w')
 
-client_publick_key_file.write(str(client_public_key))
-client_private_key_file.write(str(client_private_key))
+enduser_publick_key_file.write(str(enduser_public_key))
+enduser_private_key_file.write(str(enduser_private_key))
