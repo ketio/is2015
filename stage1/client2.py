@@ -12,13 +12,16 @@ sock.connect(server_address)
 try:
     
     # Send data
-    message = 'This is the message.  It will be repeated.'
-    print >>sys.stderr, 'sending "%s"' % message
-    sock.sendall(message)
+    for i in range(0,10):
+        message = 'Client 2'
+        print >>sys.stderr, 'sending "%s"' % message
+        import time
+        time.sleep(5)
+        sock.sendall(message)
 
     # Look for the response
     amount_received = 0
-    amount_expected = len(message)
+    amount_expected = len(message) * 10
     
     while amount_received < amount_expected:
         data = sock.recv(100)
