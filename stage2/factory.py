@@ -5,6 +5,7 @@ import threading
 import time
 from Crypto.PublicKey import RSA
 import msg
+import cipher
 
 AUTH_CODE = "NTUIM"
 f = open("factory_private_key.pem",'r')
@@ -21,7 +22,6 @@ def send_server():
     sock.bind(server_address)
     sock.listen(5)
     while True:
-
         connection, client_address = sock.accept()
         try:
             print 'connection from', client_address
@@ -32,9 +32,17 @@ def send_server():
                 data = connection.recv(10000)
                 if data:
                     print("Get Patch Request From Enduser.")
-                    data = msg.get_package_of_msg(data)
+
+                    encrypt_auth_code = msg.get_package_of_msg(data)
+                    signature_of_enduser = msg.get_Trail_of_msg(data)
+
+                    print("Verifying Signature")
+                    if not cipher.verify(encrypt_auth_code, signature_of_enduser, enduser_public_key):
+                        print("Verify Failed.")
+                        return 
+
                     print("Decrypt Request.")
-                    decrypted_code = factory_private_key.decrypt(data)
+                    decrypted_code = factory_private_key.decrypt(encrypt_auth_code)
                     
                     print("Check Authentication Code.")
                     if decrypted_code == AUTH_CODE: 
@@ -47,10 +55,12 @@ def send_server():
                             f3 = open('price.txt','r')
                             price_text = f3.read()
                         encrypted_code = enduser_public_key.encrypt(price_text,24)
-                        message = msg.generate_msg(encrypted_code[0])
+                        signature = cipher.sign(encrypted_code[0], factory_private_key)
 
-                        print("Send Price Data to Enduser")
+                        print("Send Price Data to Enduser with Signature")
+                        message = msg.generate_msg(encrypted_code[0],signature)
                         connection.sendall(message)
+
                     else:
                         print("Check Failed!")
                         connection.sendall("Code Error!")
@@ -76,7 +86,7 @@ def notifiyEndUser():
     try:
         
         # Send data
-        message = "\nNew Price Upload!\n"
+        message = '\nNew Price Upload!\n'
         message = msg.generate_msg(message)
         sock.sendall(message)
 

@@ -5,7 +5,9 @@ import time
 import csv
 from Crypto.PublicKey import RSA
 import os.path
+import cipher
 import msg
+
 
 AUTH_CODE = "NTUIM"
 f = open("factory_public_key.pem",'r')
@@ -46,18 +48,26 @@ def download_price_data():
         
         print("Encrypting Authentication Code.")
         encrypted_code = factory_public_key.encrypt(AUTH_CODE,24)
+        signature = cipher.sign(encrypted_code[0], enduser_private_key)
 
         # Send data
-        print("Send Authentication Code.")
-        message = msg.generate_msg(encrypted_code[0])
+        print("Send Authentication Code with Signature.")
+        message = msg.generate_msg(encrypted_code[0], signature)
         sock.sendall(message)
 
         # Get response
         print("Downloading New Price Data.")
-        response = sock.recv(4096)
+        response = sock.recv(10000)
 
         print("Decrypting New Price Data")
         encrpted_priced = msg.get_package_of_msg(response)
+        signature_of_factory = msg.get_Trail_of_msg(response)
+
+        print("Verifying Signature")
+        if not cipher.verify(encrpted_priced, signature_of_factory, factory_public_key):
+            print("Verify Failed.")
+            return 
+
         price = enduser_private_key.decrypt(encrpted_priced)
 
         print("New Pirce Saved.\n")
